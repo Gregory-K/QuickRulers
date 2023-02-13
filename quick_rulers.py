@@ -3,6 +3,7 @@ import sublime_plugin
 
 
 def int_or_float(value):
+    """Check value and Return int or float."""
     try:
         return int(value)
     except ValueError:
@@ -11,8 +12,7 @@ def int_or_float(value):
 
 def get_view_setting(view, sname, default=None):
     """Check if a setting is view-specific and only then return its value.
-
-    Otherwise return `default`.
+    | Otherwise return `default`.
     """
     s = view.settings()
     value = s.get(sname)
@@ -20,16 +20,13 @@ def get_view_setting(view, sname, default=None):
     value2 = s.get(sname)
     if value2 == value:
         return default
-    else:
-        s.set(sname, value)
-        return value
+    s.set(sname, value)
+    return value
 
 
 class QuickRulersCommand(sublime_plugin.TextCommand):
-
     """Command that opens a quick panel to enter a list of ruler positions.
-
-    With live preview.
+    | With live preview.
     """
 
     # "Instance" variables
@@ -37,12 +34,17 @@ class QuickRulersCommand(sublime_plugin.TextCommand):
     s = None
 
     def run(self, edit, show_current=True):
+        settings = sublime.load_settings("quick_rulers.sublime-settings")
         self.backup = get_view_setting(self.view, "rulers")
         self.s = self.view.settings()
 
-        default_text = ''
-        if show_current and self.backup:
+
+        if show_current is True and self.backup:
             default_text = ','.join(map(str, self.backup))
+        elif show_current is False:
+            default_text = ''
+        else:
+            default_text = settings.get('default_rulers')
 
         v = self.view.window().show_input_panel(
             "Position(s) of the ruler(s), separated by commas:",
@@ -60,7 +62,9 @@ class QuickRulersCommand(sublime_plugin.TextCommand):
     def on_change(self, text, done=False):
         if text:
             try:
-                rulers = [int_or_float(r.strip()) for r in text.split(',') if r]
+                rulers = [
+                    int_or_float(r.strip()) for r in text.split(',') if r
+                ]
             except ValueError as e:
                 sublime.status_message(str(e))
                 if done:

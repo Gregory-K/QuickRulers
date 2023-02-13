@@ -1,0 +1,5 @@
+{
+  // default rulers - prepopulated text input
+  // leave "" for no defaults
+  "default_rulers": "79, 119"
+}
