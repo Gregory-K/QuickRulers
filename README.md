@@ -13,8 +13,6 @@ For the time being, it provides:
 - A python 3.8 only version for **Sublime Text 4** **@done**  
   It just runs on the ST4's python3.8 plugin host, nothing extra.
 
-![No words needed](http://i.imgur.com/lEKwdBc.gif)
-
 
 ## Try
 
@@ -76,6 +74,8 @@ Key-binding examples:
     "args": {"show_current": false} }
 ]
 ```
+
+![No words needed](http://i.imgur.com/lEKwdBc.gif)
 
 
 ## Notes
