@@ -2,12 +2,18 @@ import sublime
 import sublime_plugin
 
 
-def int_or_float(value):
-    """Check value and Return int or float."""
-    try:
-        return int(value)
-    except ValueError:
-        return float(value)
+def get_config():
+    """Get Default/User Settings."""
+    global DEFAULT_RULERS
+    DEFAULT_RULERS = (
+        sublime.load_settings("quick_rulers.sublime-settings")
+        .get('default_rulers')
+    )
+
+
+def plugin_loaded():
+    """Get config on load."""
+    get_config()
 
 
 def get_view_setting(view, sname, default=None):
@@ -24,6 +30,14 @@ def get_view_setting(view, sname, default=None):
     return value
 
 
+def int_or_float(value):
+    """Check value and Return int or float."""
+    try:
+        return int(value)
+    except ValueError:
+        return float(value)
+
+
 class QuickRulersCommand(sublime_plugin.TextCommand):
     """Command that opens a quick panel to enter a list of ruler positions.
     | With live preview.
@@ -34,17 +48,16 @@ class QuickRulersCommand(sublime_plugin.TextCommand):
     s = None
 
     def run(self, edit, show_current=True):
-        settings = sublime.load_settings("quick_rulers.sublime-settings")
         self.backup = get_view_setting(self.view, "rulers")
         self.s = self.view.settings()
 
 
         if show_current is True and self.backup:
-            default_text = ','.join(map(str, self.backup))
+            default_text = ",".join(map(str, self.backup))
         elif show_current is False:
-            default_text = ''
+            default_text = ""
         else:
-            default_text = settings.get('default_rulers')
+            default_text = DEFAULT_RULERS
 
         v = self.view.window().show_input_panel(
             "Position(s) of the ruler(s), separated by commas:",
