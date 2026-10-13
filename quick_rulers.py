@@ -2,20 +2,6 @@ import sublime
 import sublime_plugin
 
 
-def get_config():
-    """Get Default/User Settings."""
-    global DEFAULT_RULERS
-    DEFAULT_RULERS = (
-        sublime.load_settings("quick_rulers.sublime-settings")
-        .get('default_rulers')
-    )
-
-
-def plugin_loaded():
-    """Get config on load."""
-    get_config()
-
-
 def get_view_setting(view, sname, default=None):
     """Check if a setting is view-specific and only then return its value.
     | Otherwise return `default`.
@@ -31,11 +17,16 @@ def get_view_setting(view, sname, default=None):
 
 
 def int_or_float(value):
-    """Check value and Return int or float."""
+    """Check value and Return int or float.
+    | Raise ValueError for a negative or non-finite value (nan, inf).
+    """
     try:
-        return int(value)
+        number = int(value)
     except ValueError:
-        return float(value)
+        number = float(value)
+    if not 0 <= number < float('inf'):  # also False for nan
+        raise ValueError(f"invalid ruler position: '{value}'")
+    return number
 
 
 class QuickRulersCommand(sublime_plugin.TextCommand):
@@ -45,19 +36,22 @@ class QuickRulersCommand(sublime_plugin.TextCommand):
 
     # "Instance" variables
     backup = None
-    s = None
+    s: sublime.Settings
 
     def run(self, edit, show_current=True):
         self.backup = get_view_setting(self.view, "rulers")
         self.s = self.view.settings()
-
 
         if show_current is True and self.backup:
             default_text = ",".join(map(str, self.backup))
         elif show_current is False:
             default_text = ""
         else:
-            default_text = DEFAULT_RULERS
+            # read on every run, so a settings change applies at once
+            default_text = (
+                sublime.load_settings("quick_rulers.sublime-settings")
+                .get('default_rulers', "")
+            )
 
         v = self.view.window().show_input_panel(
             "Position(s) of the ruler(s), separated by commas:",
@@ -76,7 +70,8 @@ class QuickRulersCommand(sublime_plugin.TextCommand):
         if text:
             try:
                 rulers = [
-                    int_or_float(r.strip()) for r in text.split(',') if r
+                    int_or_float(r) for r in map(str.strip, text.split(','))
+                    if r
                 ]
             except ValueError as e:
                 sublime.status_message(str(e))
@@ -97,7 +92,7 @@ class QuickRulersCommand(sublime_plugin.TextCommand):
         self.on_change(text, done=True)
 
     def on_cancel(self):
-        if self.backup:
+        if self.backup is not None:
             self.s.set("rulers", self.backup)
         else:
             self.s.erase("rulers")
