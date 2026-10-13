@@ -1,6 +1,6 @@
 # QuickRulers - Sublime Text Plugin
 
-This a **fork of [QuickRulers](https://github.com/FichteFoll/QuickRulers)**, a [Sublime Text 4](https://www.sublimetext.com/) plugin that provides easy access to the "rulers" setting.
+This is a **fork of [QuickRulers](https://github.com/FichteFoll/QuickRulers)**, a [Sublime Text 4](https://www.sublimetext.com/) plugin that provides easy access to the "rulers" setting.
 
 Current '[**dev**](https://github.com/Gregory-K/QuickRulers)' branch is just a personal sandbox, nothing special.
 
@@ -12,6 +12,8 @@ For the time being, it provides:
   _(something like "rulers display-toggle" and "define rulers" in one)_
 - A python 3.8 only version for **Sublime Text 4** **@done**  
   It just runs on the ST4's python3.8 plugin host, nothing extra.
+- Verified working on Sublime Text 4 >= build 4213 **@done**  
+  Python 3.14 plugin host.
 
 
 ## Try
@@ -43,8 +45,8 @@ Add to `Packages/User/Package Control.sublime-settings`,
 _alt. way_  
 1. Go to `Packages` folder.  
    _(if you don't know, click menu `Preferences` > `Browse Packages`)._
-3. Create a directory named 'QuickRulers' and 'cd' inside it.
-4. From command line
+2. Create a directory named 'QuickRulers' and 'cd' inside it.
+3. From command line
     - Default 'dev' branch (ST4)  
       `git clone --depth 1 https://github.com/Gregory-K/QuickRulers .`
     - 'dev-ST3' branch _see [Notes](#notes)_  
@@ -53,11 +55,11 @@ _alt. way_
 
 #### Update
 
-Delete the contents of `Packages/Outline` folder and repeat the "Manual Installation",
+Delete the contents of `Packages/QuickRulers` folder and repeat the "Manual Installation",
 
 OR
 
-'cd' in `Packages/Outline` folder and  
+'cd' in `Packages/QuickRulers` folder and  
 `git fetch && git rebase` for Linux  
 `git fetch; git rebase` for Windows
 
@@ -74,6 +76,10 @@ Key-binding examples:
     "args": {"show_current": false} }
 ]
 ```
+
+In the panel, separate positions with commas, e.g. `79, 119`.  
+Decimals work too (`72.5` draws between two columns).  
+An invalid position shows an error in the status bar, and submitting it restores the previous rulers.
 
 ![No words needed](http://i.imgur.com/lEKwdBc.gif)
 
